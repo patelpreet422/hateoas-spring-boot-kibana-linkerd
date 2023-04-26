@@ -58,17 +58,16 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        Optional<User> existingUser = userRepository.findById(id);
-        if (existingUser.isPresent()) {
-            User updatedUser = User.builder()
-                    .id(id)
-                    .name(user.getName())
-                    .company(user.getCompany())
-                    .build();
+    public ResponseEntity<EntityModel<User>> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userDto.setId(id);
+            modelMapper.map(userDto, user.get());
 
-            userRepository.save(updatedUser);
-            return ResponseEntity.ok(updatedUser);
+            User savedUser = userRepository.save(user.get());
+            return ResponseEntity.ok(EntityModel.of(savedUser,
+                    linkTo(methodOn(UserController.class).getUser(id)).withSelfRel(),
+                    linkTo(methodOn(UserController.class).getUsers()).withRel("users")));
         } else {
             return ResponseEntity.notFound().build();
         }
