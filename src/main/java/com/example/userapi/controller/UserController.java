@@ -1,11 +1,12 @@
 package com.example.userapi.controller;
 
 import com.example.userapi.model.User;
+import com.example.userapi.model.UserDto;
 import com.example.userapi.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<User>>> getUsers() {
@@ -43,11 +47,14 @@ public class UserController {
                 linkTo(methodOn(UserController.class).getUsers()).withRel("users")))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<EntityModel<User>> createUser(@RequestBody UserDto userDto) {
+        User user = modelMapper.map(userDto, User.class);
         User savedUser = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        return ResponseEntity.created(linkTo(methodOn(UserController.class).getUser(savedUser.getId())).toUri())
+                .body(EntityModel.of(savedUser,
+                        linkTo(methodOn(UserController.class).getUser(savedUser.getId())).withSelfRel(),
+                        linkTo(methodOn(UserController.class).getUsers()).withRel("users")));
     }
 
     @PutMapping("/{id}")
