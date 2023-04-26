@@ -36,10 +36,13 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<EntityModel<User>> getUser(@PathVariable Long id) {
         Optional<User> user = userRepository.findById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return user.map(value -> ResponseEntity.ok(EntityModel.of(value,
+                linkTo(methodOn(UserController.class).getUser(id)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getUsers()).withRel("users")))).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
@@ -74,5 +77,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
 
