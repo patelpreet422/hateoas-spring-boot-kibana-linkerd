@@ -34,9 +34,15 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	//	dependency to generate traceId and spanId
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+
+	// using logstack encoder for writing logs in logstash specific format
+	implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
+
 }
 
 tasks.named('test') {

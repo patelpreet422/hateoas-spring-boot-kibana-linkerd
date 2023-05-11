@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore log file ###
+logs/
+
+### Mac filesystem artifacts ###
+**/.DS_Store

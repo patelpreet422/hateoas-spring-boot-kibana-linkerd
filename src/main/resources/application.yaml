@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/springpg
+    url: jdbc:postgresql://localhost:5432/springdb
     username: postgres
-    password: postgres
+    password: password
   output:
     ansi:
       enabled: always
@@ -15,5 +15,13 @@ spring:
     banner-mode: off
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %level %logger{36} - %msg%n"
   level:
     root: info
+    com.example: debug
+  file:
+    name: logs/app.log
+    max-size: 10MB
+    max-history: 7
+    clean-history-on-start: true

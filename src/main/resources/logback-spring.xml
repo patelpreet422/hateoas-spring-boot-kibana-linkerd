@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <springProperty name="LOG_FILE" source="logging.file.name"/>
+    <springProperty name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" source="logging.file.max-size"/>
+    <springProperty name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" source="logging.file.max-history"/>
+    <springProperty name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" source="logging.file.clean-history-on-start"/>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Console Appender -->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <!-- Spring Boot Default File Appender -->
+    <!-- <include resource="org/springframework/boot/logging/logback/file-appender.xml" />-->
+
+    <!-- File Appender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root>
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
