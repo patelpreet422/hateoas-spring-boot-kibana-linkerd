@@ -14,6 +14,12 @@ spring:
   main:
     banner-mode: off
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} %level %logger{36} - %msg%n"

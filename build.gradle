@@ -40,6 +40,9 @@ dependencies {
 	//	dependency to generate traceId and spanId
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
+	// dependency to export application metric for prometheus
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
 	// using logstack encoder for writing logs in logstash specific format
 	implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
 
