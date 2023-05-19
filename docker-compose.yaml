@@ -1,20 +1,44 @@
 version: '3'
 services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+  postgres:
+    image: postgres:15
+    container_name: postgres-container
     environment:
-      - node.name=elasticsearch
-      - cluster.name=docker-cluster
-      - discovery.type=single-node
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=springdb
     ports:
-      - 9200:9200
+      - "5432:5432"
+    restart: always
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.7.1
-    environment:
-      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus-container
     ports:
-      - 5601:5601
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
+
+  grafana:
+    image: grafana/grafana-oss:9.5.2
+    container_name: grafana-container
+    ports:
+      - "3000:3000"
+
+  loki:
+    image: grafana/loki:2.8.0
+    container_name: loki-container
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.8.0
+    container_name: promtail-container
     depends_on:
-      - elasticsearch
-
+      - loki
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - ./logs/app.log:/user-api-application/logs/app.log
+    command: -config.file=/etc/promtail/config.yml
