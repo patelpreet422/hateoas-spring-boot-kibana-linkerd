@@ -41,3 +41,10 @@ logs/
 
 ### Mac filesystem artifacts ###
 **/.DS_Store
+
+elasticsearch/data
+elasticsearch/_state
+elasticsearch/indices
+elasticsearch/snapshot_cache
+elasticsearch/node.lock
+elasticsearch/nodes

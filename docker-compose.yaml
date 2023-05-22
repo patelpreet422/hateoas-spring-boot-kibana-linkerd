@@ -4,12 +4,24 @@ services:
     image: postgres:15
     container_name: postgres-container
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=springdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: springdb
     ports:
       - "5432:5432"
     restart: always
+
+  userapi-app:
+    build:
+      context:
+        .
+    container_name: userapi-app
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
 
   prometheus:
     image: prom/prometheus:v2.44.0
@@ -40,5 +52,59 @@ services:
       - loki
     volumes:
       - ./promtail-config.yml:/etc/promtail/config.yml
-      - ./logs/app.log:/user-api-application/logs/app.log
+      - ./logs/app.log:/user-api-application/logs/app.log:ro,z
     command: -config.file=/etc/promtail/config.yml
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    container_name: elasticsearch-container
+    environment:
+      node.name: elasticsearch-01
+      discovery.type: single-node
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  setup_es_users:
+    build:
+      context:
+        setup-es-users
+    container_name: setup-es-users-container
+    volumes:
+      - ./setup-es-users/setup-users.sh:/scripts/setup-users.sh:rx,Z
+      - ./setup-es-users/lib.sh:/scripts/lib.sh:rx,Z
+      - ./setup-es-users/roles:/scripts/roles:ro,Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      LOGSTASH_SYSTEM_PASSWORD: ${LOGSTASH_SYSTEM_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    container_name: kibana-container
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.7.1
+    container_name: logstash-container
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logs/app.log:/logs/app.log:ro,z
+    ports:
+      - "5044:5044"
+    depends_on:
+      - elasticsearch
