@@ -5,6 +5,8 @@
     <springProperty name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" source="logging.file.max-size"/>
     <springProperty name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" source="logging.file.max-history"/>
     <springProperty name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" source="logging.file.clean-history-on-start"/>
+    <springProperty name="LOKI_URL" source="loki.url"/>
+
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
@@ -28,8 +30,25 @@
         </rollingPolicy>
     </appender>
 
+    <!-- Loki Appender -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL}/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${appName},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </message>
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
+
     <root>
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="LOKI" />
     </root>
 </configuration>

@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: userapi-server
   datasource:
     url: jdbc:postgresql://localhost:5432/springdb
     username: postgres
@@ -15,6 +17,19 @@ spring:
     banner-mode: off
 
 management:
+  # For Exemplars to work we need histogram buckets
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+  # All traces should be sent to latency analysis tool
+  tracing:
+    sampling:
+      probability: 1
+
   endpoints:
     web:
       exposure:
@@ -31,3 +46,6 @@ logging:
     max-size: 10MB
     max-history: 7
     clean-history-on-start: true
+
+loki:
+  url: "http://localhost:3100"
