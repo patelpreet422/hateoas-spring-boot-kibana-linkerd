@@ -4,6 +4,5 @@ spring:
     username: postgres
     password: password
 
-
 loki:
   url: http://loki:3100

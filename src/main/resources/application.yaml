@@ -16,6 +16,11 @@ spring:
   main:
     banner-mode: off
 
+# swagger-ui custom path
+springdoc:
+  swagger-ui:
+  path: /swagger-ui.html
+
 management:
   # For Exemplars to work we need histogram buckets
   metrics:

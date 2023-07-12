@@ -23,6 +23,12 @@ services:
     depends_on:
       - postgres
 
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    restart: always
+    ports:
+      - "9411:9411"
+
   prometheus:
     image: prom/prometheus:v2.44.0
     container_name: prometheus-container

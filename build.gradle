@@ -6,7 +6,9 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+java {
+	sourceCompatibility = '17'
+}
 
 configurations {
 	compileOnly {
@@ -41,7 +43,7 @@ dependencies {
 	// loki appender
 	implementation 'com.github.loki4j:loki-logback-appender:1.4.1'
 
-	//	dependency to generate traceId and spanId
+	// dependency to generate traceId and spanId
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
 	// dependency to start zipkin reporter
@@ -52,6 +54,9 @@ dependencies {
 
 	// using logstack encoder for writing logs in logstash specific format
 	implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
+
+	// adding swagger ui
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 
 }
 

@@ -6,6 +6,7 @@
     <springProperty name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" source="logging.file.max-history"/>
     <springProperty name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" source="logging.file.clean-history-on-start"/>
     <springProperty name="LOKI_URL" source="loki.url"/>
+    <springProperty name="APP_NAME" source="spring.application.name"/>
 
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
@@ -37,7 +38,7 @@
         </http>
         <format>
             <label>
-                <pattern>app=${appName},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
+                <pattern>app=${APP_NAME},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
             </label>
             <message>
                 <pattern>${FILE_LOG_PATTERN}</pattern>
